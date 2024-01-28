@@ -43,4 +43,3 @@ app.listen(3000, (req, res) => {
 })
 
 
-// Connection string => mongodb+srv://ayushkokate1:X2REcxi5w5nRVHm3@cluster0.6ry0cy0.mongodb.net/
