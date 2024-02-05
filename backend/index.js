@@ -1,46 +1,15 @@
 const express = require("express");
 const app = express();
-const { db } = require("./db");
+const port = 4000;
+const rootRouter = require('./routes/index')
+const userRouter = require('./routes/user')
 
-app.use(express.json());
+const Router = express.Router();
+app.use('/api/v1', rootRouter)
+app.use('/api/v1', userRouter )
 
-// home route
-app.get('/', (req, res) => {
-    res.send(`Paytm`)
+
+app.listen(port, (req, res) => {
+    console.log(`Server is listening on port ${port}`);
 })
 
-// get request for signup page
-app.get('/signup', (req, res) => {
-  res.send('signup')
-})
-
-// post request for signup page
-app.post('/signup', (req, res) => {
-    // signing up
-});
-
-// get request for signin page
-app.get('/signin', (req, res) => {
-    res.send(`signin`)
-})
-
-// post request for signin page 
-app.post('/signin', (req, res) => {
-
-})
-
-// update data
-app.get('/settings', (req, res) => {
-    res.send('update profile')
-})
-
-app.put('/settings', (req, res) => {
-    // perform operation
-})
-
-app.listen(3000, (req, res) => {
-    console.log(`Server is listening on port 3000`);
-})
-
-
-// Connection string => mongodb+srv://ayushkokate1:X2REcxi5w5nRVHm3@cluster0.6ry0cy0.mongodb.net/
