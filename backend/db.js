@@ -5,7 +5,7 @@ mongoose.connect(uri);
 
 const userSchema = new mongoose.Schema({
     username: String,
-    password: string
+    password: String
 })
 
 const user = new mongoose.model('user', userSchema)
