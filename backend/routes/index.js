@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 const express = require('express');
 const app = express();
 const port = 4000;
@@ -18,3 +19,6 @@ module.exports = router;
 
 
 
+=======
+
+>>>>>>> cf2a14d7d7e2ccd8e5c729ad528c6667bdf641d2
