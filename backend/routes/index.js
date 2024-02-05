@@ -14,11 +14,3 @@ router.get('/', (req, res, next) => {
 })
 
 module.exports = router;
-
-
-
-
-
-=======
-
->>>>>>> cf2a14d7d7e2ccd8e5c729ad528c6667bdf641d2
