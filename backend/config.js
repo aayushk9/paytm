@@ -1,4 +1,5 @@
 require("dotenv").config();
-const JWT = process.env.JWT_SECRET
 
-module.exports = {JWT}  
+module.exports = {
+    SECRET_KEY : process.env.JWT_SECRET
+}
