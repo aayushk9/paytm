@@ -1,9 +1,9 @@
 const jwt = require("jsonwebtoken")
-const SECRET_KEY = require(".//config");
+const { SECRET_KEY } = require("./config");
 
 const authMiddleware = (req, res, next) => {
     const authHeader = req.headers.authorization;
-    if(!authHeader) {
+    if(!authHeader || !authHeader.startsWith('Bearer')) {
         return res.status(411).json({
             msg: "No token exists"
         })
@@ -16,8 +16,9 @@ const authMiddleware = (req, res, next) => {
         req.userId = decoded.userId;
         next()
     } catch (err) {
+        console.error(err)
         return res.status(403).json({
-            error: []
+            error:err
         })
     }
 }
