@@ -1,10 +1,12 @@
 const express = require("express");
 const zod = require("zod");
 const bcrypt = require("bcrypt");
-const User = require('../models/db');
+const { Account } = require('../models/db');
+const { User } = require("../models/db")
 const { SECRET_KEY } = require("../config");
 const jwt = require("jsonwebtoken");
 const router = express.Router();
+const { authMiddleware } = require("../middleware");
 
 router.post("/signup", async (req, res) => {
     try {
@@ -34,8 +36,8 @@ router.post("/signup", async (req, res) => {
         )
 
         if (!parsingUserData) {
-            return res.status(400).json({
-                error: parsingUserData.error.errors
+            return res.status(411).json({
+                error: "invalid input"
 
             })
         }
@@ -65,13 +67,21 @@ router.post("/signup", async (req, res) => {
         })
         const userId = user._id;
 
+        await Account.create({
+            userId: userId,
+            balance: 10000
+        })
+
+        //await account.save()
         await user.save()
         const token = jwt.sign({ userId }, SECRET_KEY)
         return res.status(200).json({
             msg: "user created successfully",
-            token: token
+            token: token,
+            BankBalance: account.balance
         })
     } catch (err) {
+        console.error(err)
         return res.json({
             error: err
         })
@@ -80,7 +90,7 @@ router.post("/signup", async (req, res) => {
 
 router.post("/login", async (req, res) => {
 
-    const username = req.body.username; 
+    const username = req.body.username;
     const password = req.body.password;
 
     const loginBody = zod.object({
@@ -100,7 +110,7 @@ router.post("/login", async (req, res) => {
     const validate = loginBody.safeParse(user)
     if (!validate) {
         return res.status(411).json({
-            error: "no input recieved"
+            error: "invalid input"
         })
     }
 
@@ -119,7 +129,67 @@ router.post("/login", async (req, res) => {
             })
         }
     }
-
 })
 
-module.exports = router
+router.put("/", authMiddleware, (req, res) => {
+    try {
+        const firstName = req.body.firstName;
+        const lastName = req.body.lastName;
+        const password = req.body.password;
+
+        const inputValidate = zod.object({
+            firstName: zod.string().min(2, "firstname is required"),
+            lastName: zod.string().min(2, "lastname is required"),
+            password: zod.string().
+                min(8, "password must contain atleast 8 characters").
+                regex(/[A-Z]/, "password must contain atleast one capital letter").
+                regex(/[0-9]/, "password mus contain atleast one number").
+                regex(/[\W_]/, "password must contain atleast one special character")
+        })
+
+        const inputValidation = inputValidate.safeParse({
+            firstName: firstName,
+            lastName: lastName,
+            password: password
+        })
+
+        if (!inputValidation) {
+            return res.status(411).json({
+                msg: "invalid input"
+            })
+        }
+
+        return res.status(200).json({
+            msg: "user info updates successfully"
+        })
+    } catch (err) {
+        console.error(err);
+        return res.json({
+            error: "some error occured"
+        })
+    }
+})
+
+router.get("/bulk", async (req, res) => {
+    const search = req.query.search || ""
+
+    const users = await User.find({
+        $or: [
+            {
+                firstName: {
+                    $regex: search,
+                    $options: "i"
+                }
+            }
+        ]
+    })
+
+    res.status(200).json({
+        users: users.map(user => ({
+            firstName: user.firstName,
+            id: users._id
+        }))
+    })
+})
+
+module.exports = router    
