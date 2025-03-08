@@ -23,19 +23,24 @@ router.post("/transfer", authMiddleware, async (req, res) => {
     const to = req.body.to;
     const amount = req.body.amount;
 
-    const account = await Account.findOne({ userId: req.userId }).session(session);
-    if (!account || amount > Account.balance) {
+    if (!amount || isNaN(amount) || amount <= 0) {
+        await session.abortTransaction();
+        return res.status(400).json({ msg: "Invalid transfer amount" });
+    }
+
+    const account = await Account.findOne({ userId: req.userId }).session(session); // the person who is sending money
+    if (!account || amount > account.balance) {
         await session.abortTransaction();
         return res.status(400).json({
             msg: "Not enough balance"
         })
     }
 
-    const toAccount = await Account.findOne({ userId: to }).session(session);
+    const toAccount = await Account.findOne({ userId: to }).session(session); // person whom we are sending
 
     if (!toAccount) {
         await session.abortTransaction();
-        res.status(400).json({
+        return res.status(400).json({
             msg: "user does not exist"
         })
     }
@@ -51,13 +56,15 @@ router.post("/transfer", authMiddleware, async (req, res) => {
     await Account.updateOne({
         userId: to
     }, {
-        $inc: amount
+        $inc: {
+             balance: amount
+        }
     }).session(session)
 
     await session.commitTransaction();
-    res.status(200).json({
+    return res.status(200).json({
         msg: "transaction successfull"
     })
 })
 
-module.exports = router 
+module.exports = router  
