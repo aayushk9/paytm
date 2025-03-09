@@ -1,0 +1,12 @@
+ Frontend todo
+
+ - /signin: when user enters some data, send that data to backend and let backend do its computation and if we get
+    right response from backend navigate to /dashboard else send user a alert with what went wrong
+
+ - /login: same for login route ------
+
+ - /dashboard: user should be able to see exisiting user and also see a option of send money, to go further when user
+    clicks on send money it would take them to /send route for a particular user they selected
+
+ - /send should have inputs such as enter amount, enter username (whom to send) and send money (add some keys if poss 
+    while sending money)
