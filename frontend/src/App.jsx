@@ -1,9 +1,8 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom' 
 import { Dashboard } from './pages/Dashboard'
 import { Signin } from './pages/Signin'
-import { Signup } from './pages/components/Signup'
-import { Send } from './pages/components/Send'  
-import './App.css'
+import { Signup } from './pages/Signup'
+import { Send } from './pages/Send'  
 
 function App() {
   return (
@@ -11,7 +10,7 @@ function App() {
        <BrowserRouter>
           <Routes>
             <Route path ='/login' element={<Signin/>}/>
-            <Route path='/Signup' element={<Signup/>}/>
+            <Route path='/' element={<Signup/>}/>
             <Route path='/dashboard' element={<Dashboard/>}/>
             <Route path='/send' element={<Send/>}/>
           </Routes>
