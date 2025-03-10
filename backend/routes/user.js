@@ -20,10 +20,7 @@ router.post("/signup", async (req, res) => {
             firstName: zod.string().min(2, "firstname is required"),
             lastName: zod.string().min(2, "lastname is required"),
             password: zod.string().
-                min(8, "password must contain atleast 8 characters").
-                regex(/[A-Z]/, "password must contain atleast one capital letter").
-                regex(/[0-9]/, "password must contain atleast one number").
-                regex(/[\W_]/, "password must contain atleast one special character")
+                min(8, "password must contain atleast 8 characters")
         })
 
         const parsingUserData = validateUserData.safeParse(
@@ -38,7 +35,6 @@ router.post("/signup", async (req, res) => {
         if (!parsingUserData) {
             return res.status(411).json({
                 error: "invalid input"
-
             })
         }
 
@@ -71,13 +67,13 @@ router.post("/signup", async (req, res) => {
             userId: userId,
             balance: 10000
         });
-        
 
         await newAccount.save()
         await user.save()
         const token = jwt.sign({ userId }, SECRET_KEY)
+        console.log(user)
         return res.status(200).json({
-            msg: "user created successfully",
+            success: "user created successfully",
             token: token,
             BankBalance: newAccount.balance
         })
@@ -96,11 +92,7 @@ router.post("/login", async (req, res) => {
 
     const loginBody = zod.object({
         username: zod.string().min(2, "username is required"),
-        password: zod.string().
-            min(8, "password must contain atleast 8 characters").
-            regex(/[A-Z]/, "password must contain atleast one capital letter").
-            regex(/[0-9]/, "password must contain atleast one number").
-            regex(/[\W_]/, "password must contain atleast one special character")
+        password: zod.string()
     })
     const user = {
         username: req.body.username,
