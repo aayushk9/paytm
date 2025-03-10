@@ -1,13 +1,11 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom' 
-import { Dashboard } from './components/Dashboard'
-import { Signin } from './components/Signin'
-import { Signup } from './components/Signup'
-import { Send } from './components/Send'  
+import { Dashboard } from './pages/Dashboard'
+import { Signin } from './pages/Signin'
+import { Signup } from './pages/components/Signup'
+import { Send } from './pages/components/Send'  
 import './App.css'
 
 function App() {
-  
-
   return (
     <div>
        <BrowserRouter>
