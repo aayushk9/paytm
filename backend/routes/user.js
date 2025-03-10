@@ -19,8 +19,7 @@ router.post("/signup", async (req, res) => {
             username: zod.string().min(2, "username should consist atleast two characters"),
             firstName: zod.string().min(2, "firstname is required"),
             lastName: zod.string().min(2, "lastname is required"),
-            password: zod.string().
-                min(8, "password must contain atleast 8 characters")
+            password: zod.string().min(8, "password must contain atleast 8 characters")
         })
 
         const parsingUserData = validateUserData.safeParse(
@@ -92,7 +91,7 @@ router.post("/login", async (req, res) => {
 
     const loginBody = zod.object({
         username: zod.string().min(2, "username is required"),
-        password: zod.string()
+        password: zod.string().min(8, 'password must contain atleast 8 characters')
     })
     const user = {
         username: req.body.username,
@@ -133,11 +132,7 @@ router.put("/", authMiddleware, (req, res) => {
         const inputValidate = zod.object({
             firstName: zod.string().min(2, "firstname is required"),
             lastName: zod.string().min(2, "lastname is required"),
-            password: zod.string().
-                min(8, "password must contain atleast 8 characters").
-                regex(/[A-Z]/, "password must contain atleast one capital letter").
-                regex(/[0-9]/, "password mus contain atleast one number").
-                regex(/[\W_]/, "password must contain atleast one special character")
+            password: zod.string().min(8, "password must contain atleast 8 characters")
         })
 
         const inputValidation = inputValidate.safeParse({
