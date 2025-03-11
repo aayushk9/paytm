@@ -9,10 +9,17 @@ router.get("/balance", authMiddleware, async (req, res) => {
     const account = await Account.findOne({
         userId: req.userId
     })
-
-    return res.status(200).json({
-        balance: account.balance
-    })
+    const userId = req.userId;
+    console.log(userId);
+    if(account.balance != null){
+        return res.status(200).json({
+            balance: account.balance
+        })
+    } else {
+        return res.status(411).json({
+            msg: "not able to fetch balance"
+        })
+    }
 })
 
 router.post("/transfer", authMiddleware, async (req, res) => {
