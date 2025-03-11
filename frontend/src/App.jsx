@@ -3,6 +3,7 @@ import { Dashboard } from './pages/Dashboard'
 import { Signin } from './pages/Signin'
 import { Signup } from './pages/Signup'
 import { Send } from './pages/Send'  
+import { Update } from './pages/Update'
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
             <Route path='/' element={<Signup/>}/>
             <Route path='/dashboard' element={<Dashboard/>}/>
             <Route path='/send' element={<Send/>}/>
+            <Route path='/data/update' element={<Update/>}/>
           </Routes>
        </BrowserRouter>
     </div>
