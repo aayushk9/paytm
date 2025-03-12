@@ -70,6 +70,7 @@ router.post("/transfer", authMiddleware, async (req, res) => {
 
     await session.commitTransaction();
     return res.status(200).json({
+        success: true,
         msg: "transaction successfull"
     })
 })
