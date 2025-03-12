@@ -41,14 +41,19 @@ export function Signup() {
               }
              }  
             )
+            console.log(res.data);   
               if(res.data.token){
                 localStorage.setItem("token", res.data.token)
                 navigate("/dashboard")
+              } else if(res.data.msg == "please go to login route"){
+                alert("user exists")
+              } else if(res.data.msg == "username already exists please choose other username") {
+                alert("username already taken")
               } else {
-                alert("Oops something went wrong")
+                alert("password must contain atleast 8 character")
               }
             } catch(err) {
-              console.log(err)
+              console.log(err)     
               alert("error signing up")   
             }            
           }}
