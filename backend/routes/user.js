@@ -24,23 +24,23 @@ router.post("/signup", async (req, res) => {
 
         const parsingUserData = validateUserData.safeParse(
             {
-                username: username,
-                firstName: firstName,
-                lastName: lastName,
-                password: password
+                username,
+                firstName,
+                lastName,
+                password
             }
         )
 
-        if (!parsingUserData) {
+        if (!parsingUserData.success) {
             return res.status(411).json({
-                error: "invalid input"
+                msg: "invalid input"
             })
         }
 
         const usernameExists = await User.findOne({ username })
         if (usernameExists) {
             const comparePasswords = await bcrypt.compare(password, usernameExists.password)
-            if (comparePasswords) {
+            if (usernameExists && comparePasswords) {
                 return res.status(411).json({
                     msg: "please go to login route"
                 })
@@ -60,17 +60,17 @@ router.post("/signup", async (req, res) => {
             lastName: lastName,
             password: hashedPassword
         })
-        const userId = user._id;
+        await user.save()
 
         const newAccount = new Account({
-            userId: userId,
+            userId: user._id,
             balance: 10000
         });
-
         await newAccount.save()
-        await user.save()
-        const token = jwt.sign({ userId }, SECRET_KEY)
-        console.log(user)
+        
+        const token = jwt.sign({ userId: user._id.toString() }, SECRET_KEY)
+        console.log(token)  
+
         return res.status(200).json({
             success: "user created successfully",
             token: token,
@@ -89,95 +89,111 @@ router.post("/login", async (req, res) => {
     const username = req.body.username;
     const password = req.body.password;
 
+    console.log(req.body)
+
     const loginBody = zod.object({
         username: zod.string().min(2, "username is required"),
         password: zod.string().min(8, 'password must contain atleast 8 characters')
     })
+
     const user = {
         username: req.body.username,
         password: req.body.password
     }
-    const userId = user._id
 
     const validate = loginBody.safeParse(user)
-    if (!validate) {
-        return res.status(411).json({
-            error: "invalid input"
-        })
+    if (!validate.success) {  
+        return res.status(400).json({ 
+            msg: "Invalid input"  
+        });
     }
 
-    const token = jwt.sign({ userId }, SECRET_KEY)
     const usernameExist = await User.findOne({ username });
     if (usernameExist) {
         const comparePassword = await bcrypt.compare(password, usernameExist.password);
-        if (comparePassword) {
+        if (usernameExist && comparePassword) {
+            const token = jwt.sign({ userId: usernameExist._id.toString() }, SECRET_KEY)
+            console.log(token)
             return res.status(200).json({
                 msg: "user logged in",
                 token: token
             })
-        } else {
-            return res.status(411).json({
+        } else if (password != usernameExist.password) {
+            return res.status(400).json({
                 msg: "wrong password"
+            })
+        } else {
+            return res.status(400).json({
+                msg: "enter correct username or signup"
             })
         }
     }
 })
 
-router.put("/", authMiddleware, (req, res) => {
+router.put("/update", authMiddleware, (req, res) => {
     try {
-        const firstName = req.body.firstName;
-        const lastName = req.body.lastName;
+        const username = req.body.username;
         const password = req.body.password;
+        console.log(req.body);
 
         const inputValidate = zod.object({
-            firstName: zod.string().min(2, "firstname is required"),
-            lastName: zod.string().min(2, "lastname is required"),
+            username: zod.string().min(2, "username is required"),
             password: zod.string().min(8, "password must contain atleast 8 characters")
         })
 
         const inputValidation = inputValidate.safeParse({
-            firstName: firstName,
-            lastName: lastName,
+            username: username,
             password: password
         })
 
-        if (!inputValidation) {
+        if (!inputValidation.success) {
             return res.status(411).json({
                 msg: "invalid input"
             })
         }
 
         return res.status(200).json({
-            msg: "user info updates successfully"
+            success: true,
+            msg: "user info updated successfully"
         })
     } catch (err) {
         console.error(err);
         return res.json({
-            error: "some error occured"
+            msg: "some error occured"
         })
     }
 })
 
-router.get("/bulk", async (req, res) => {
+router.get("/bulk", authMiddleware, async (req, res) => {
     const search = req.query.search || ""
+    console.log(req.query.search);
 
-    const users = await User.find({
-        $or: [
-            {
-                firstName: {
-                    $regex: search,
-                    $options: "i"
-                }
+    let users = []
+    if (search.trim()) { 
+        users = await User.find({
+            username: {
+                $regex: search,
+                $options: "i"
             }
-        ]
-    })
+        });
 
-    res.status(200).json({
-        users: users.map(user => ({
-            firstName: user.firstName,
-            id: users._id
-        }))
-    })
-})
+        console.log(users);
+        return res.status(200).json({
+            users: users.map(user => ({
+                username: user.username,
+                id: user._id  
+            }))
+        });
+    }
+   
+        const sampleUsers = await User.aggregate([{ $sample: { size: 4 } }])
+        return res.status(200).json({
+            users: sampleUsers.map(user => ({
+                username: user.username,
+                id: user._id  
+            }))
+        });    
+    
+});
 
 module.exports = router    
