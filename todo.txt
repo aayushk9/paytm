@@ -10,3 +10,5 @@
 
  - /send should have inputs such as enter amount, enter username (whom to send) and send money (add some keys if poss 
     while sending money)
+
+-  /notifications 
